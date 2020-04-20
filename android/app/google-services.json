@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1090662706408",
+    "firebase_url": "https://smart-labels-caf48.firebaseio.com",
+    "project_id": "smart-labels-caf48",
+    "storage_bucket": "smart-labels-caf48.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1090662706408:android:4abd4ab719d6407e036d5d",
+        "android_client_info": {
+          "package_name": "com.example.smart_labels"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1090662706408-abcandjqnbr4qve22qevkqsujs85k0ls.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQnBA8VfuyeufVD3KtpK5MMVFl6I-cum4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1090662706408-abcandjqnbr4qve22qevkqsujs85k0ls.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
