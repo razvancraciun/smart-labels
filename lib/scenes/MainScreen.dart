@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:smart_labels2/model/AppState.dart';
 import 'package:smart_labels2/model/DetectedObject.dart';
 import 'package:smart_labels2/services/ApiClient.dart';
-import 'package:tflite/tflite.dart';
 import 'package:smart_labels2/scenes/components/BoundingBox.dart';
 import 'package:hive/hive.dart';
 import 'package:smart_labels2/model/Language.dart';
@@ -28,36 +27,19 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
         print(_appState);
         _cameraController = CameraController(_appState.cameras[0], ResolutionPreset.max);
         _cameraController.initialize().then( (_) {
-            if(!mounted) {
+            if (!mounted) {
                 return;
             }
-            _cameraController.startImageStream( (img) async {
+            _cameraController.startImageStream((img) async {
                 _frame++;
 
-                if(_frame % 4 != 0) {
+                if (_frame % 4 != 0) {
                     return;
                 }
 
-                try {
-                    var objects = await Tflite.detectObjectOnFrame(
-                        bytesList: img.planes.map( (plane) => plane.bytes).toList(),
-                        model: _appState.detectionModel,
-                        imageHeight: img.height,
-                        imageWidth: img.width,
-                        imageMean: 127.5,   // defaults to 127.5
-                        imageStd: 127.5,    // defaults to 127.5
-                        rotation: 90,       // defaults to 90, Android only
-                        threshold: 0.25,     // defaults to 0.1
-                        asynch: true        // defaults to true
-                    );
-                    print(objects);
+                var bytes = img.planes.map( (plane) => plane.bytes).toList();
+                print(bytes.runtimeType);
 
-                    setState(() {
-                        _detectedObjects = objects.map( (obj) {return DetectedObject.fromTfliteOutput(obj);} ).toList();
-                    });
-
-                  // _cameraController.stopImageStream();
-                } catch (e) {}
             });
         });
     }

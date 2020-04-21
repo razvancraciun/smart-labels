@@ -1,7 +1,5 @@
 
 
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:smart_labels2/model/DetectedObject.dart';

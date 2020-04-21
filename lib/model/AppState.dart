@@ -2,6 +2,7 @@
 
 import 'package:camera/camera.dart';
 import 'package:smart_labels2/model/Constants.dart';
+import 'package:smart_labels2/services/TfliteClient.dart';
 import 'Language.dart';
 import 'package:hive/hive.dart';
 
@@ -13,8 +14,8 @@ class AppStateObserver {
 class AlreadyInstantiatedException implements Exception {}
 
 class AppState {
-    String _detectionModel;
-    String get detectionModel => _detectionModel;
+    TfliteClient _tfliteClient;
+    TfliteClient get tfliteClient => _tfliteClient;
 
     List<CameraDescription> _cameras;
     List<CameraDescription> get cameras => _cameras;
@@ -40,8 +41,8 @@ class AppState {
         _observers.remove(obs);
     }
 
-    void init(_detectionModel, _cameras) {
-        this._detectionModel = _detectionModel;
+    void init(_tfliteClient, _cameras) {
+        this._tfliteClient = _tfliteClient;
         this._cameras = _cameras;
         var configBox = Hive.box(HiveKeys.configBox);
         _selectedLanguage = LanguageCodes.languageFromCode(configBox.get(HiveKeys.selectedLanguageKey));
