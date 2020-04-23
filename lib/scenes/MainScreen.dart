@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_labels2/model/AppState.dart';
+import 'package:smart_labels2/model/Constants.dart';
 import 'package:smart_labels2/model/DetectedObject.dart';
 import 'package:smart_labels2/services/ApiClient.dart';
 import 'package:smart_labels2/scenes/components/BoundingBox.dart';
@@ -24,21 +25,20 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
     @override
     void initState() {
         super.initState();
-        print(_appState);
-        _cameraController = CameraController(_appState.cameras[0], ResolutionPreset.max);
-        _cameraController.initialize().then( (_) {
+        _cameraController = CameraController(_appState.cameras[0], ResolutionPreset.medium);
+        _cameraController.initialize().then( (_) async {
             if (!mounted) {
                 return;
             }
-            _cameraController.startImageStream((img) async {
+            await Future.delayed(Duration(milliseconds : 200));
+            _cameraController.startImageStream((img) {
                 _frame++;
 
-                if (_frame % 4 != 0) {
+                if (_frame % 10 != 0) {
                     return;
                 }
 
-                var bytes = img.planes.map( (plane) => plane.bytes).toList();
-                print(bytes.runtimeType);
+                runInference(img);
 
             });
         });
@@ -98,6 +98,13 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
         }
         showModalBottomSheet(context: context, builder: (context) {
             return Text('Tapped on ${boundingBox.detectedClass}. Translation: $translation', style: TextStyle(fontSize: 20),);
+        });
+    }
+
+    void runInference(CameraImage image) async {
+        List<DetectedObject> detectedObjects = await _appState.tfliteClient.run(image);
+        setState(() {
+          _detectedObjects = detectedObjects.where((obj) => obj.confidence >= InferenceModelConstants.confidenceTreshold).toList();
         });
     }
 }

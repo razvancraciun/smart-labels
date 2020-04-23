@@ -2,7 +2,7 @@
 
 
 class DetectedObject {
-    _Rectangle rectangle;
+    Rectangle rectangle;
     String detectedClass;
     double confidence;
 
@@ -11,19 +11,19 @@ class DetectedObject {
     DetectedObject.fromTfliteOutput(element) {
         detectedClass = element['detectedClass'];
         confidence = element['confidenceInClass'];
-        rectangle = _Rectangle.fromTfliteOutput(element['rect']);
+        rectangle = Rectangle.fromTfliteOutput(element['rect']);
     }
 }
 
-class _Rectangle {
+class Rectangle {
     double x;
     double y;
     double width;
     double height;
 
-    _Rectangle(this.x, this.y, this.width, this.height);
+    Rectangle(this.x, this.y, this.width, this.height);
 
-    _Rectangle.fromTfliteOutput(element) {
+    Rectangle.fromTfliteOutput(element) {
         x = element['x'];
         y = element['y'];
         width = element['w'];

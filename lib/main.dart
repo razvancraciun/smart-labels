@@ -32,6 +32,7 @@ void main() async {
     apiClient.init(remoteConfig.getString(ApiConstants.remoteConfigTranslateKey));
 
     TfliteClient tfliteClient = TfliteClient();
+    await tfliteClient.init();
 
     AppState appState = AppState();
     appState.init(tfliteClient, cameras);

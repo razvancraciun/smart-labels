@@ -3,18 +3,111 @@
 
 import 'dart:typed_data';
 
+import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
+import 'package:smart_labels2/model/Constants.dart';
+import 'package:smart_labels2/model/DetectedObject.dart';
+import 'package:smart_labels2/scenes/components/BoundingBox.dart';
+import 'package:image/image.dart';
+import 'package:image/image.dart' as imLib;
 
 class TfliteClient {
 
     MethodChannel _methodChannel = const MethodChannel('tflite/interpreter');
 
-    void init() async {
+    Future<void> init() async {
         await _methodChannel.invokeMethod('init');
     }
 
-    void run(List<Uint8List> bytes) async {
-       var objects = await _methodChannel.invokeMethod('run', bytes);
+    Future<List<DetectedObject>> run(CameraImage image) async {
+        int targetWidth = 480;
+        int targetHeight = 480;
+        Image img = convertYUV420toImageColor(image);
+        img = copyResize(img, width: 480, height: 480);
+
+
+        List<List<List<double>>> input = List.generate(480, (row) {
+            return List.generate(480, (col) {
+                List<double> channels = [];
+                channels.add(imLib.getRed(img.getPixel(row, col)) / 255);
+                channels.add(imLib.getGreen(img.getPixel(row, col)) / 255);
+                channels.add(imLib.getBlue(img.getPixel(row, col)) / 255);
+                return channels;
+            });
+        });
+
+        var output = await _methodChannel.invokeMethod('run', {"input" : input});
+        List<DetectedObject> detectedObjects = decodeOutput(output);
+        return detectedObjects;
+    }
+
+    List<DetectedObject> decodeOutput(List objects) {
+        int gridSize = InferenceModelConstants.gridSize;
+        List<DetectedObject> result = [];
+
+        for(int i=0; i<gridSize*gridSize; i++) {
+            int row =  i ~/ gridSize;
+            int col  = i % gridSize;
+
+            List<dynamic> cellOutput = objects[i];
+
+            double confidence = cellOutput[0];
+            double x = col * 1/gridSize + cellOutput[1];
+            double y = row * 1/gridSize + cellOutput[2];
+            double w = 1/gridSize * cellOutput[3];
+            double h = 1/gridSize * cellOutput[4];
+
+            List<dynamic> classes = cellOutput.sublist(5);
+            int argmax = 0;
+            double max = classes[0];
+            for(int i=1; i<classes.length; i++) {
+                if(classes[i]>max) {
+                    max = classes[i];
+                    argmax = i;
+                }
+            }
+            String detectedClass = InferenceModelConstants.classes[argmax];
+
+
+            result.add(DetectedObject(Rectangle(x,y,w,h), detectedClass, confidence));
+
+        }
+
+        return result;
+    }
+
+    Image convertYUV420toImageColor(CameraImage image) {
+        final int width = image.width;
+        final int height = image.height;
+        final int uvRowStride = image.planes[1].bytesPerRow;
+        final int uvPixelStride = image.planes[1].bytesPerPixel;
+
+        const alpha255 = (0xFF << 24);
+
+        final img = Image(width, height); // Create Image buffer
+
+        // Fill image buffer with plane[0] from YUV420_888
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                final int uvIndex =
+                    uvPixelStride * (x / 2).floor() + uvRowStride * (y / 2).floor();
+                final int index = y * width + x;
+
+                final yp = image.planes[0].bytes[index];
+                final up = image.planes[1].bytes[uvIndex];
+                final vp = image.planes[2].bytes[uvIndex];
+                // Calculate pixel color
+                int r = (yp + vp * 1436 / 1024 - 179).round().clamp(0, 255);
+                int g = (yp - up * 46549 / 131072 + 44 - vp * 93604 / 131072 + 91)
+                    .round()
+                    .clamp(0, 255);
+                int b = (yp + up * 1814 / 1024 - 227).round().clamp(0, 255);
+                // color: 0x FF  FF  FF  FF
+                //           A   B   G   R
+                img.data[index] = alpha255 | (b << 16) | (g << 8) | r;
+            }
+        }
+        return img;
     }
 
 }

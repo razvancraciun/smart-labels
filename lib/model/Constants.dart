@@ -21,3 +21,10 @@ class Routes {
     static final String mainScreen = '/main';
     static final String languageSelectionScreen = '/languageSelection';
 }
+
+class InferenceModelConstants {
+    static final double confidenceTreshold = 0.9;
+    static final int gridSize = 8;
+    static final List<String> classes = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep', 'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
+        'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'];
+}

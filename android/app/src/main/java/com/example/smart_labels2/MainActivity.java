@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import android.content.res.AssetFileDescriptor;
@@ -49,7 +51,11 @@ public class MainActivity extends FlutterActivity {
                             }
 
                             if (call.method.equals("run")) {
-                                result.success(runInterpreter(call.argument("image")));
+                                ArrayList<ArrayList<ArrayList<Double>>> input = call.argument("input");
+
+                                result.success(runInterpreter(input));
+
+                                return;
                             }
 
                             result.notImplemented();
@@ -72,14 +78,32 @@ public class MainActivity extends FlutterActivity {
         }
     }
 
-    private String runInterpreter(ArrayList<Integer> input_data) {
-        float input[][] = new float[1][input_data.size()];
+    private ArrayList<ArrayList<Double>> runInterpreter(ArrayList<ArrayList<ArrayList<Double>>> input) {
+        float inp[][][][] = new float[1][input.size()][input.get(0).size()][input.get(0).get(0).size()];
+
+        for(int row = 0; row < input.size(); row++) {
+            for(int col = 0; col < input.get(row).size(); col++) {
+                for(int channel = 0; channel < input.get(row).get(col).size(); channel++) {
+                    inp[0][row][col][channel] = input.get(row).get(col).get(channel).floatValue();
+                }
+            }
+        }
 
         float[][][] output = new float[1][GRID_SIZE * GRID_SIZE][NUM_CLASSES + 5];
 
-        interpreter.run(input, output);
-        System.out.println(output);
+        interpreter.run(inp, output);
 
-        return "";
+        ArrayList<ArrayList<Double>> result = new ArrayList<>(GRID_SIZE * GRID_SIZE);
+        for(int i=0; i<GRID_SIZE * GRID_SIZE; i++) {
+            ArrayList<Double> cell = new ArrayList<Double>(NUM_CLASSES + 5);
+            for (int j = 0; j < NUM_CLASSES + 5; j++) {
+                output[0][i][j] = output[0][i][j];
+                cell.add(new Double(output[0][i][j]));
+            }
+            result.add(cell);
+        }
+
+
+        return result;
     }
 }
