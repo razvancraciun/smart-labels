@@ -20,14 +20,14 @@ class TfliteClient {
     }
 
     Future<List<DetectedObject>> run(CameraImage image) async {
-        int targetWidth = 480;
-        int targetHeight = 480;
+        int targetWidth = InferenceModelConstants.imageSize;
+        int targetHeight = InferenceModelConstants.imageSize;
         Image img = convertYUV420toImageColor(image);
-        img = copyResize(img, width: 480, height: 480);
+        img = copyResize(img, width: targetWidth, height: targetHeight);
 
 
-        List<List<List<double>>> input = List.generate(480, (row) {
-            return List.generate(480, (col) {
+        List<List<List<double>>> input = List.generate(targetWidth, (row) {
+            return List.generate(targetHeight, (col) {
                 List<double> channels = [];
                 channels.add(imLib.getRed(img.getPixel(row, col)) / 255);
                 channels.add(imLib.getGreen(img.getPixel(row, col)) / 255);
@@ -52,10 +52,10 @@ class TfliteClient {
             List<dynamic> cellOutput = objects[i];
 
             double confidence = cellOutput[0];
-            double x = col * 1/gridSize + cellOutput[1];
-            double y = row * 1/gridSize + cellOutput[2];
-            double w = 1/gridSize * cellOutput[3];
-            double h = 1/gridSize * cellOutput[4];
+            double x = col * 1/gridSize + cellOutput[1] * 1/gridSize;
+            double y = row * 1/gridSize + cellOutput[2] * 1/gridSize;
+            double w = cellOutput[3];
+            double h = cellOutput[4];
 
             List<dynamic> classes = cellOutput.sublist(5);
             int argmax = 0;

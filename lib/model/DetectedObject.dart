@@ -13,6 +13,11 @@ class DetectedObject {
         confidence = element['confidenceInClass'];
         rectangle = Rectangle.fromTfliteOutput(element['rect']);
     }
+
+    @override
+    String toString() {
+    return "x: ${rectangle.x}, y: ${rectangle.y}, w: ${rectangle.width}, h: ${rectangle.height}, class: $detectedClass, confidence: $confidence";
+  }
 }
 
 class Rectangle {

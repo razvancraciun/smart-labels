@@ -32,7 +32,7 @@ public class MainActivity extends FlutterActivity {
     private Interpreter interpreter;
 
     private static final String CHANNEL = "tflite/interpreter";
-    private static final int GRID_SIZE = 8;
+    private static final int GRID_SIZE = 7;
     private static final int NUM_CLASSES = 20;
 
     @Override
@@ -65,7 +65,7 @@ public class MainActivity extends FlutterActivity {
 
     private String initInterpreter() {
         try {
-            AssetFileDescriptor fileDescriptor = this.getAssets().openFd("save0419-1241.tflite");
+            AssetFileDescriptor fileDescriptor = this.getAssets().openFd("save0521-1156.tflite");
             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
             FileChannel fileChannel = inputStream.getChannel();
             long startOffset = fileDescriptor.getStartOffset();
@@ -77,6 +77,16 @@ public class MainActivity extends FlutterActivity {
             return e.getMessage();
         }
     }
+
+    private Double sigmoid(Double x) {
+        return (1 /(1 + Math.pow(Math.E, (-1 * x))) );
+    }
+
+    private Double exp(Double x) {
+        return Math.pow(Math.E, x);
+    }
+
+
 
     private ArrayList<ArrayList<Double>> runInterpreter(ArrayList<ArrayList<ArrayList<Double>>> input) {
         float inp[][][][] = new float[1][input.size()][input.get(0).size()][input.get(0).get(0).size()];
@@ -97,11 +107,19 @@ public class MainActivity extends FlutterActivity {
         for(int i=0; i<GRID_SIZE * GRID_SIZE; i++) {
             ArrayList<Double> cell = new ArrayList<Double>(NUM_CLASSES + 5);
             for (int j = 0; j < NUM_CLASSES + 5; j++) {
-                output[0][i][j] = output[0][i][j];
+                if(j < 3) {
+                    cell.add( new Double(output[0][i][j]) );
+                    continue;
+                } else if (j >=3 && j < 5) {
+                    cell.add( new Double(output[0][i][j]));
+                    continue;
+                }
                 cell.add(new Double(output[0][i][j]));
             }
             result.add(cell);
         }
+
+
 
 
         return result;

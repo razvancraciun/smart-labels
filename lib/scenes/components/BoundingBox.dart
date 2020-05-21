@@ -23,21 +23,22 @@ class BoundingBox extends StatelessWidget {
         final  size = MediaQuery.of(context).size;
         final deviceRatio = size.width / size.height;
 
-        var left = size.width * _detectedObject.rectangle.x;
 
-        var top = size.height * _detectedObject.rectangle.y;
         var width = size.width * _detectedObject.rectangle.width;
         var height = size.height * _detectedObject.rectangle.height;
+        var top = size.height * _detectedObject.rectangle.y;
+        var left = size.width * _detectedObject.rectangle.x;
+
 
         Widget objectContainer = Container(
             child: Align(
                 alignment: Alignment.topLeft,
                 child: Text(
-                    _detectedObject.detectedClass,
+                   '${_detectedObject.detectedClass}-${_detectedObject.confidence.toStringAsFixed(2)}',
                     style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,
-                        backgroundColor: Colors.black,
+                        backgroundColor: _colorForClass(_detectedObject.detectedClass),
                         decoration: TextDecoration.none
                     ),
 
@@ -45,7 +46,7 @@ class BoundingBox extends StatelessWidget {
 
             ),
             decoration:  BoxDecoration(
-                border: Border.all(color: Colors.black, width: 3.0),
+                border: Border.all(color: _colorForClass(_detectedObject.detectedClass), width: 3.0),
             ),
         );
 
@@ -61,4 +62,25 @@ class BoundingBox extends StatelessWidget {
         );
     }
 
+    Color _colorForClass(String cls) {
+        switch (cls) {
+            case 'person':
+                return Colors.pink;
+            case 'bird':
+                return Colors.indigo;
+            case 'cat':
+                return Colors.lightBlue;
+            case 'cow':
+                return Colors.green;
+            case 'dog':
+                return Colors.deepPurple;
+            case 'horse':
+                return Colors.deepOrange;
+
+            default:
+                return Colors.black;
+                //, 'sheep', 'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
+                //'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'
+        };
+    }
 }

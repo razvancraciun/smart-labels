@@ -21,11 +21,12 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
     int _frame = 0;
     List<DetectedObject> _detectedObjects = [];
     int _loading = 0;
+    bool _interpreter_busy = false;
 
     @override
     void initState() {
         super.initState();
-        _cameraController = CameraController(_appState.cameras[0], ResolutionPreset.medium);
+        _cameraController = CameraController(_appState.cameras[0], ResolutionPreset.low);
         _cameraController.initialize().then( (_) async {
             if (!mounted) {
                 return;
@@ -34,9 +35,9 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
             _cameraController.startImageStream((img) {
                 _frame++;
 
-                if (_frame % 10 != 0) {
-                    return;
-                }
+//                if (_frame % 10 != 0) {
+//                    return;
+//                }
 
                 runInference(img);
 
@@ -102,9 +103,15 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
     }
 
     void runInference(CameraImage image) async {
+        if(_interpreter_busy) {
+            return;
+        }
+        _interpreter_busy = true;
         List<DetectedObject> detectedObjects = await _appState.tfliteClient.run(image);
+        _interpreter_busy = false;
         setState(() {
           _detectedObjects = detectedObjects.where((obj) => obj.confidence >= InferenceModelConstants.confidenceTreshold).toList();
+            print(_detectedObjects.toString());
         });
     }
 }
