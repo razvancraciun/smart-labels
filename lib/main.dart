@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smart_labels2/model/Constants.dart';
 import 'package:smart_labels2/scenes/LanguageSelectionScreen.dart';
 import 'package:smart_labels2/services/ApiClient.dart';
@@ -6,15 +7,17 @@ import 'package:smart_labels2/services/TfliteClient.dart';
 import 'package:camera/camera.dart';
 import 'package:smart_labels2/scenes/MainScreen.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:smart_labels2/model/AppState.dart';
 import 'model/Constants.dart';
-
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 void main() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Hive.initFlutter();
+    Directory documentDir = await getApplicationDocumentsDirectory();
+
+    Hive.init(documentDir.path);
     await Hive.openBox(HiveKeys.configBox);
 
     List<CameraDescription> cameras;
@@ -49,7 +52,7 @@ class SmartLabelsApp extends StatelessWidget {
             initialRoute: Routes.languageSelectionScreen,
             routes: {
                 Routes.languageSelectionScreen : (context) => LanguageSelectionScreen(),
-                Routes.mainScreen : (context) => MainScreen(),
+                Routes.cameraDetect : (context) => MainScreen(),
             },
         );
     }

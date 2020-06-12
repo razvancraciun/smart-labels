@@ -12,7 +12,6 @@ import 'package:image/image.dart';
 import 'package:image/image.dart' as imLib;
 
 class TfliteClient {
-
     MethodChannel _methodChannel = const MethodChannel('tflite/interpreter');
 
     Future<void> init() async {
@@ -23,7 +22,10 @@ class TfliteClient {
         int targetWidth = InferenceModelConstants.imageSize;
         int targetHeight = InferenceModelConstants.imageSize;
         Image img = convertYUV420toImageColor(image);
-        img = copyResize(img, width: targetWidth, height: targetHeight);
+
+        int x = (img.width - targetWidth) ~/ 2;
+        int y = (img.height - targetHeight) ~/ 2;
+        img = copyCrop(img,  x, y, targetWidth, targetHeight);
 
 
         List<List<List<double>>> input = List.generate(targetWidth, (row) {
@@ -38,6 +40,12 @@ class TfliteClient {
 
         var output = await _methodChannel.invokeMethod('run', {"input" : input});
         List<DetectedObject> detectedObjects = decodeOutput(output);
+        detectedObjects = detectedObjects.map((object) {
+//            object.rectangle.x +=  (img.width - targetWidth) / 2 / targetWidth;
+//            object.rectangle.y += (img.height - targetHeight) / 2 / targetHeight;
+            object.rectangle.height *= (targetHeight / img.height);
+            return object;
+        }).toList();
         return detectedObjects;
     }
 
@@ -45,33 +53,18 @@ class TfliteClient {
         int gridSize = InferenceModelConstants.gridSize;
         List<DetectedObject> result = [];
 
-        for(int i=0; i<gridSize*gridSize; i++) {
-            int row =  i ~/ gridSize;
-            int col  = i % gridSize;
+        result = objects.map( (prediction) {
+            double confidence = prediction[0];
+            double w = prediction[3];
+            double h = prediction[4];
+            double x = prediction[1] - w / 2;
+            double y = prediction[2] - h / 2;
+            String detectedClass = InferenceModelConstants.classes[prediction[5].toInt()];
 
-            List<dynamic> cellOutput = objects[i];
-
-            double confidence = cellOutput[0];
-            double x = col * 1/gridSize + cellOutput[1] * 1/gridSize;
-            double y = row * 1/gridSize + cellOutput[2] * 1/gridSize;
-            double w = cellOutput[3];
-            double h = cellOutput[4];
-
-            List<dynamic> classes = cellOutput.sublist(5);
-            int argmax = 0;
-            double max = classes[0];
-            for(int i=1; i<classes.length; i++) {
-                if(classes[i]>max) {
-                    max = classes[i];
-                    argmax = i;
-                }
-            }
-            String detectedClass = InferenceModelConstants.classes[argmax];
-
-
-            result.add(DetectedObject(Rectangle(x,y,w,h), detectedClass, confidence));
-
+            return DetectedObject(Rectangle(x,y,w,h), detectedClass, confidence);
         }
+
+        ).toList();
 
         return result;
     }

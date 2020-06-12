@@ -30,7 +30,7 @@ class LanguageSelectionScreenState extends State<LanguageSelectionScreen> implem
                         onPressed: _appState.selectedLanguage == null ? null : () async {
                                 await Hive.openBox(_appState.selectedLanguage.code);
                                 Hive.box(HiveKeys.configBox).put(HiveKeys.selectedLanguageKey, _appState.selectedLanguage.code);
-                                Navigator.pushNamed(context, Routes.mainScreen);
+                                Navigator.pushNamed(context, Routes.cameraDetect);
                             },
                     )
                 ],

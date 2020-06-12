@@ -33,14 +33,7 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
             }
             await Future.delayed(Duration(milliseconds : 200));
             _cameraController.startImageStream((img) {
-                _frame++;
-
-//                if (_frame % 10 != 0) {
-//                    return;
-//                }
-
                 runInference(img);
-
             });
         });
     }
@@ -76,11 +69,18 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
 
         final size = MediaQuery.of(context).size;
         final deviceRatio = size.width / size.height;
-        return AspectRatio(
-            aspectRatio: _cameraController.value.aspectRatio,
-            child: Stack(
-                children: stackChildren,
+        return Scaffold(
+            appBar: AppBar(
+                title: Text("Smart Labels"),
             ),
+            body: new Container(
+                child: new AspectRatio(
+                    aspectRatio: _cameraController.value.aspectRatio,
+                    child: Stack(
+                        children: stackChildren,
+                    )
+                ),
+                ),
         );
     }
 
@@ -103,15 +103,15 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
     }
 
     void runInference(CameraImage image) async {
-        if(_interpreter_busy) {
-            return;
-        }
-        _interpreter_busy = true;
+//        if(_interpreter_busy) {
+//            return;
+//        }
+//        _interpreter_busy = true;
         List<DetectedObject> detectedObjects = await _appState.tfliteClient.run(image);
-        _interpreter_busy = false;
+//        _interpreter_busy = false;
         setState(() {
           _detectedObjects = detectedObjects.where((obj) => obj.confidence >= InferenceModelConstants.confidenceTreshold).toList();
-            print(_detectedObjects.toString());
+//            print(_detectedObjects.toString());
         });
     }
 }

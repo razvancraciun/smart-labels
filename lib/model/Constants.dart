@@ -18,14 +18,16 @@ class AssetPath {
 }
 
 class Routes {
-    static final String mainScreen = '/main';
+    static final String cameraDetect = '/main';
+    static final String imageDetect = '/imageDetect';
     static final String languageSelectionScreen = '/languageSelection';
 }
 
 class InferenceModelConstants {
     static final int imageSize = 224;
-    static final double confidenceTreshold = 0.2;
+    static final double confidenceTreshold = 0.5;
+    static final int nAnchors = 5;
     static final int gridSize = 7;
-    static final List<String> classes = ['person', 'bird', 'cat', 'cow', 'dog', 'horse', 'sheep', 'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
-        'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'];
+    static final List<String> classes = ['aeroplane', 'bicycle', 'bird', 'boat', 'bottle', 'bus', 'car', 'cat', 'chair', 'cow', 'dining table',
+        'dog', 'horse', 'motorbike', 'person', 'potted plant', 'sheep', 'sofa', 'train', 'tv / monitor'];
 }

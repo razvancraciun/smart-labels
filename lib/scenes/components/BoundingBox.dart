@@ -21,18 +21,15 @@ class BoundingBox extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
         final  size = MediaQuery.of(context).size;
-        final deviceRatio = size.width / size.height;
-
 
         var width = size.width * _detectedObject.rectangle.width;
         var height = size.height * _detectedObject.rectangle.height;
-        var top = size.height * _detectedObject.rectangle.y;
-        var left = size.width * _detectedObject.rectangle.x;
-
+        var top = size.height * (_detectedObject.rectangle.y);
+        var left = size.width * (_detectedObject.rectangle.x);
 
         Widget objectContainer = Container(
             child: Align(
-                alignment: Alignment.topLeft,
+                alignment: Alignment.center,
                 child: Text(
                    '${_detectedObject.detectedClass}-${_detectedObject.confidence.toStringAsFixed(2)}',
                     style: TextStyle(
@@ -76,7 +73,8 @@ class BoundingBox extends StatelessWidget {
                 return Colors.deepPurple;
             case 'horse':
                 return Colors.deepOrange;
-
+            case 'chair':
+                return Colors.brown;
             default:
                 return Colors.black;
                 //, 'sheep', 'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',

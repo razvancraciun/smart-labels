@@ -24,8 +24,8 @@ dependencies:
   http:
   firebase_remote_config: ^0.3.0
   hive: ^1.4.1
-  hive_flutter: ^0.3.0
-  path_provider: ^1.6.5
+  path_provider: ^1.5.1
+  permission: ^0.1.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -34,8 +34,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  hive_generator: ^0.7.0+2
   build_runner: ^1.8.0
+
 
 
 # For information on the generic Dart part of this file, see the
@@ -50,7 +50,7 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-      - assets/tflite/
+#  assets:
+#    - assets/tflite/
 
 
