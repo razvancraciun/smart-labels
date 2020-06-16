@@ -33,6 +33,7 @@ public class MainActivity extends FlutterActivity {
     private static final int NUM_CLASSES = 20;
     private static final int N_ANCHORS = 5;
     private static final Double iou_tresh = 0.4;
+    private static final Double conf_tresh = 0.55;
 
     private final List<Double> anchorW = Arrays.asList(1.08, 3.42, 6.63, 9.42, 16.62);
     private final List<Double> anchorH = Arrays.asList(1.19, 4.41, 11.38, 5.11, 10.52);
@@ -207,7 +208,7 @@ public class MainActivity extends FlutterActivity {
                     Double detectedClass = argmax(classPredictions);
                     confidence *= max(classPredictions);
 
-                    if(confidence < 0.5) {
+                    if(confidence < conf_tresh) {
                         continue;
                     }
 

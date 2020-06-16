@@ -24,12 +24,12 @@ class BoundingBox extends StatelessWidget {
 
         var width = size.width * _detectedObject.rectangle.width;
         var height = size.height * _detectedObject.rectangle.height;
-        var top = size.height * (_detectedObject.rectangle.y);
-        var left = size.width * (_detectedObject.rectangle.x);
+        var top = size.height * (_detectedObject.rectangle.y) - height / 2;
+        var left = size.width * (_detectedObject.rectangle.x) - width / 2;
 
         Widget objectContainer = Container(
             child: Align(
-                alignment: Alignment.center,
+                alignment: Alignment.topLeft,
                 child: Text(
                    '${_detectedObject.detectedClass}-${_detectedObject.confidence.toStringAsFixed(2)}',
                     style: TextStyle(

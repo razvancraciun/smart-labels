@@ -14,6 +14,9 @@ import 'package:image/image.dart' as imLib;
 class TfliteClient {
     MethodChannel _methodChannel = const MethodChannel('tflite/interpreter');
 
+    int _duration = 0;
+    int _runs = 0;
+
     Future<void> init() async {
         await _methodChannel.invokeMethod('init');
     }
@@ -23,9 +26,9 @@ class TfliteClient {
         int targetHeight = InferenceModelConstants.imageSize;
         Image img = convertYUV420toImageColor(image);
 
-        int x = (img.width - targetWidth) ~/ 2;
-        int y = (img.height - targetHeight) ~/ 2;
-        img = copyCrop(img,  x, y, targetWidth, targetHeight);
+        int x = (img.width - img.height) ~/ 2;
+        img = copyCrop(img,  x, 0, img.height, img.height);
+        img = copyResize(img, width: targetWidth, height: targetHeight);
 
 
         List<List<List<double>>> input = List.generate(targetWidth, (row) {
@@ -38,12 +41,29 @@ class TfliteClient {
             });
         });
 
+        var start = DateTime.now();
+
         var output = await _methodChannel.invokeMethod('run', {"input" : input});
+
+
+        var stop = DateTime.now();
+        var duration = Duration.microsecondsPerHour * stop.hour + Duration.microsecondsPerMinute * stop.minute +
+            Duration.microsecondsPerSecond * stop.second + Duration.microsecondsPerMillisecond * stop.millisecond + stop.microsecond
+            - (Duration.microsecondsPerHour * start.hour + Duration.microsecondsPerMinute * start.minute +
+                Duration.microsecondsPerSecond * start.second + Duration.microsecondsPerMillisecond * start.millisecond + start.microsecond);
+        _duration += duration;
+        _runs += 1;
+        if(_runs % 100 == 0) {
+            print(_runs * 1000000/ _duration);
+        }
+
         List<DetectedObject> detectedObjects = decodeOutput(output);
         detectedObjects = detectedObjects.map((object) {
-//            object.rectangle.x +=  (img.width - targetWidth) / 2 / targetWidth;
-//            object.rectangle.y += (img.height - targetHeight) / 2 / targetHeight;
-            object.rectangle.height *= (targetHeight / img.height);
+            // getting coordinates relative to original image
+            object.rectangle.x +=  (img.width - targetWidth) / 2 / targetWidth;
+            object.rectangle.y += (img.height - targetHeight) / 2 / targetHeight;
+            object.rectangle.height /= (targetHeight / img.height);
+            object.rectangle.width /= (targetWidth / img.width);
             return object;
         }).toList();
         return detectedObjects;
@@ -57,8 +77,8 @@ class TfliteClient {
             double confidence = prediction[0];
             double w = prediction[3];
             double h = prediction[4];
-            double x = prediction[1] - w / 2;
-            double y = prediction[2] - h / 2;
+            double x = prediction[1];
+            double y = prediction[2];
             String detectedClass = InferenceModelConstants.classes[prediction[5].toInt()];
 
             return DetectedObject(Rectangle(x,y,w,h), detectedClass, confidence);
