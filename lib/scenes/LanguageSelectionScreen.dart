@@ -24,6 +24,7 @@ class LanguageSelectionScreenState extends State<LanguageSelectionScreen> implem
         return Scaffold(
             appBar: AppBar(
                 title: const Text('Select a language'),
+                backgroundColor: SmartLabelsColors.gray2,
                 actions: <Widget>[
                     FlatButton(
                         child: Text('Done', style: TextStyle(fontSize: 20, color: _appState.selectedLanguage == null ? Colors.white60 : Colors.white),),
@@ -35,6 +36,7 @@ class LanguageSelectionScreenState extends State<LanguageSelectionScreen> implem
                     )
                 ],
             ),
+            backgroundColor: SmartLabelsColors.gray3,
             body: ListView.builder(itemBuilder: (context, index) {
                 if(index >= Language.values.length) {
                     return null;

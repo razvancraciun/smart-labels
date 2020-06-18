@@ -32,8 +32,8 @@ public class MainActivity extends FlutterActivity {
     private static final int GRID_SIZE = 7;
     private static final int NUM_CLASSES = 20;
     private static final int N_ANCHORS = 5;
-    private static final Double iou_tresh = 0.4;
-    private static final Double conf_tresh = 0.55;
+    private static final Double iou_tresh = 0.3;
+    private static final Double conf_tresh = 0.6;
 
     private final List<Double> anchorW = Arrays.asList(1.08, 3.42, 6.63, 9.42, 16.62);
     private final List<Double> anchorH = Arrays.asList(1.19, 4.41, 11.38, 5.11, 10.52);
@@ -80,7 +80,7 @@ public class MainActivity extends FlutterActivity {
 
     private String initInterpreter() {
         try {
-            AssetFileDescriptor fileDescriptor = this.getAssets().openFd("tflite/yoloLITE.tflite");
+            AssetFileDescriptor fileDescriptor = this.getAssets().openFd("tflite/finalLeaky.tflite");
             FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
             FileChannel fileChannel = inputStream.getChannel();
             long startOffset = fileDescriptor.getStartOffset();
@@ -162,7 +162,7 @@ public class MainActivity extends FlutterActivity {
                 for(int jj=0; jj < ii; jj++) {
                     ArrayList<Double> box1 = boxes.get(ii);
                     ArrayList<Double> box2 = boxes.get(jj);
-                    if(calcIOU(box1.get(1), box1.get(2), box1.get(3), box1.get(4), box2.get(1), box2.get(2), box2.get(3), box2.get(4)) > iou_tresh) {
+                    if(calcIOU(box1.get(1), box1.get(2), box1.get(3), box1.get(4), box2.get(1), box2.get(2), box2.get(3), box2.get(4)) > iou_tresh && box1.get(5).intValue() == box2.get(5).intValue()) {
                         boxes.remove(ii);
                         ii--;
                         break;

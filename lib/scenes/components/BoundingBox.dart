@@ -78,7 +78,7 @@ class BoundingBox extends StatelessWidget {
             default:
                 return Colors.black;
                 //, 'sheep', 'aeroplane', 'bicycle', 'boat', 'bus', 'car', 'motorbike', 'train',
-                //'bottle', 'chair', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'
+                //'bottle', 'diningtable', 'pottedplant', 'sofa', 'tvmonitor'
         };
     }
 }

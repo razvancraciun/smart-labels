@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_labels2/model/AppState.dart';
+import 'package:smart_labels2/model/Constants.dart';
 import 'package:smart_labels2/model/DetectedObject.dart';
 import 'package:smart_labels2/services/ApiClient.dart';
 import 'package:smart_labels2/scenes/components/BoundingBox.dart';
@@ -71,7 +72,7 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
         return Scaffold(
             appBar: AppBar(
                 title: Text("Smart Labels"),
-                backgroundColor: Colors.blueGrey,
+                backgroundColor: SmartLabelsColors.gray2,
             ),
             body: Center(
                 child: Container(
@@ -83,7 +84,7 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
                     ),
                     ),
             ),
-            backgroundColor: Colors.black12,
+            backgroundColor: Colors.black,
 
         );
     }
@@ -102,7 +103,13 @@ class _MainScreenState extends State<MainScreen> implements BoundingBoxDelegate 
             });
         }
         showModalBottomSheet(context: context, builder: (context) {
-            return Text('Tapped on ${boundingBox.detectedClass}. Translation: $translation', style: TextStyle(fontSize: 20),);
+            return Container(
+                child: Text('Tapped on "${boundingBox.detectedClass}".\n Translation in ${_appState.selectedLanguage.description}: \n"$translation"',
+                    style: TextStyle(fontSize: 30, color: Colors.white),
+                    textAlign: TextAlign.center,
+                    maxLines: 3,),
+                color: SmartLabelsColors.gray3,
+            );
         });
     }
 

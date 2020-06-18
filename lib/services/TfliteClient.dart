@@ -41,29 +41,31 @@ class TfliteClient {
             });
         });
 
-        var start = DateTime.now();
+//        var start = DateTime.now();
 
         var output = await _methodChannel.invokeMethod('run', {"input" : input});
 
 
-        var stop = DateTime.now();
-        var duration = Duration.microsecondsPerHour * stop.hour + Duration.microsecondsPerMinute * stop.minute +
-            Duration.microsecondsPerSecond * stop.second + Duration.microsecondsPerMillisecond * stop.millisecond + stop.microsecond
-            - (Duration.microsecondsPerHour * start.hour + Duration.microsecondsPerMinute * start.minute +
-                Duration.microsecondsPerSecond * start.second + Duration.microsecondsPerMillisecond * start.millisecond + start.microsecond);
-        _duration += duration;
-        _runs += 1;
-        if(_runs % 100 == 0) {
-            print(_runs * 1000000/ _duration);
-        }
+//        var stop = DateTime.now();
+//        var duration = Duration.microsecondsPerHour * stop.hour + Duration.microsecondsPerMinute * stop.minute +
+//            Duration.microsecondsPerSecond * stop.second + Duration.microsecondsPerMillisecond * stop.millisecond + stop.microsecond
+//            - (Duration.microsecondsPerHour * start.hour + Duration.microsecondsPerMinute * start.minute +
+//                Duration.microsecondsPerSecond * start.second + Duration.microsecondsPerMillisecond * start.millisecond + start.microsecond);
+//        _duration += duration;
+//        _runs += 1;
+//        if(_runs % 100 == 0) {
+//            print(_runs * 1000000/ _duration);
+//        }
 
+        var inputWidth = img.height;
+        var inputHeight =  img.height;
         List<DetectedObject> detectedObjects = decodeOutput(output);
         detectedObjects = detectedObjects.map((object) {
             // getting coordinates relative to original image
-            object.rectangle.x +=  (img.width - targetWidth) / 2 / targetWidth;
-            object.rectangle.y += (img.height - targetHeight) / 2 / targetHeight;
-            object.rectangle.height /= (targetHeight / img.height);
-            object.rectangle.width /= (targetWidth / img.width);
+            object.rectangle.x *= (inputWidth / img.width);
+            object.rectangle.y *= (inputHeight / img.height);
+            object.rectangle.width *= (inputWidth / img.width);
+            object.rectangle.height *= (inputHeight / img.height);
             return object;
         }).toList();
         return detectedObjects;
@@ -82,9 +84,7 @@ class TfliteClient {
             String detectedClass = InferenceModelConstants.classes[prediction[5].toInt()];
 
             return DetectedObject(Rectangle(x,y,w,h), detectedClass, confidence);
-        }
-
-        ).toList();
+        }).toList();
 
         return result;
     }
