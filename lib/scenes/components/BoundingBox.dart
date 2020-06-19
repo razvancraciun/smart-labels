@@ -29,11 +29,11 @@ class BoundingBox extends StatelessWidget {
 
         Widget objectContainer = Container(
             child: Align(
-                alignment: Alignment.topLeft,
+                alignment: Alignment.topCenter,
                 child: Text(
                    '${_detectedObject.detectedClass}-${_detectedObject.confidence.toStringAsFixed(2)}',
                     style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 10 + 0.02 *  (width + height) / 2,
                         color: Colors.white,
                         backgroundColor: _colorForClass(_detectedObject.detectedClass),
                         decoration: TextDecoration.none
